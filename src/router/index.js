@@ -7,14 +7,36 @@ const routes = [
   {
     path: '/auth/register',
     name: 'Register',
-    component: () => import('@/views/auth/Register') //路由懒加载
+    component: () => import('@/views/auth/Register')
+  },
+  // 首页路由配置
+  {
+    path: '/',
+    name: 'Home',
+    component: () => import('@/views/Home')
+  },
+  // 其他未配置的路由都跳转到首页
+  {
+    path: '*',
+    // 重定向
+    redirect: '/'
   }
 ]
 
-const router = new Router({
-  //路由模式，默认值 'hash' 使用井号（ # ）作路由，值 'history' 可利用 History API 来完成页面跳转且无须重新加载
+const router =  new Router({
   mode: 'history',
   routes
+})
+
+// 全局前置守卫
+router.beforeEach((to, from, next) => {
+  const auth = router.app.$options.store.state.auth
+
+  if (auth && to.path.indexOf('/auth/') !== -1) {
+    next('/')
+  } else {
+    next()
+  }
 })
 
 export default router
